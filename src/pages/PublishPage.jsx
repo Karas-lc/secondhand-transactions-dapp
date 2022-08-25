@@ -1,16 +1,73 @@
 import NavigationBar from "../components/NavivationBar";
 import React, {useEffect, useRef, useState} from "react";
-import Web3 from "web3";
 import Box from "@mui/material/Box";
 import {Button, message, Upload} from "antd";
-import {LoadingOutlined, PlusOutlined, UploadOutlined} from '@ant-design/icons';
-import * as pinata from "@pinata/sdk";
+import Web3 from "web3";
+import {LoadingOutlined, PlusOutlined} from "@ant-design/icons";
+import { useWeb3 } from '@openzeppelin/network/react';
+import { create, CID, IPFSHTTPClient } from "ipfs-http-client";
+
+const infuraProjectId = '2Dqfuw4lxAJbkviO7vv2pGAtaSn';
+const infuraProjectSecret = '96e52de36d0828f5b257be9b9c46985c';
+const authorization = "Basic " + btoa(infuraProjectId + ":" + infuraProjectSecret);
+function publishPage() {
+    const [images, setImages] = React.useState<{ cid: CID, path: string }[]>([]);
+
+    let ipfs: IPFSHTTPClient | undefined;
+    try {
+        ipfs = create({
+            url: "https://ipfs.infura.io:5001/api/v0",
+            headers: {
+                authorization,
+            },
+        });
+    } catch (error) {
+        console.error("IPFS error ", error);
+        ipfs = undefined;
+    }
+    const onSubmitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const form = event.target as HTMLFormElement;
+        const files = (form[0] as HTMLInputElement).files;
+
+        if (!files || files.length === 0) {
+            return alert("No files selected");
+        }
+
+        const file = files[0];
+        // upload Files
+        const result = await (ipfs as IPFSHTTPClient).add(file);
 
 
-function PublishPage() {
+        // @ts-ignore
+        setImages(uniqueImages);
+
+        form.reset();
+    };
+
+    console.log("images ", images);
+    const web3Context = useWeb3(`wss://mainnet.infura.io/ws/v3/${infuraProjectId}`);
+    const { networkId, networkName, providerName } = web3Context;
     const [loading, setLoading] = useState(false);
     const [account, setAccount] = useState();
     const [imageUrl, setImageUrl] = useState();
+    useEffect(() => {
+        async function load() {
+            const web3 = new Web3(
+                Web3.givenProvider || "http://localhost:8545"
+            );
+            const accounts = await web3.eth.requestAccounts();
+
+            setAccount(accounts[0]);
+        }
+
+        load();
+    }, []);
+    const input_name = useRef(null)
+    const input_author = useRef(null)
+    const input_price = useRef(null)
+    const input_description = useRef(null)
+    let input_pic;
     const getBase64 = (img, callback) => {
         const reader = new FileReader();
         reader.addEventListener('load', () => callback(reader.result));
@@ -42,9 +99,9 @@ function PublishPage() {
             getBase64(info.file.originFileObj, (url) => {
                 setLoading(false);
                 setImageUrl(url);
+                input_pic = info.file.originFileObj
+                console.log(info.file.originFileObj)
             });
-            console.log(info.file)
-            input_pic = info.file
         }
     };
     const uploadButton = (
@@ -59,52 +116,10 @@ function PublishPage() {
             </div>
         </div>
     );
-    useEffect(() => {
-        async function load() {
-            const web3 = new Web3(
-                Web3.givenProvider || "http://localhost:8545"
-            );
-            const accounts = await web3.eth.requestAccounts();
-
-            setAccount(accounts[0]);
-        }
-
-        load();
-    }, []);
-    const input_name = useRef(null)
-    const input_author = useRef(null)
-    const input_price = useRef(null)
-    const input_description = useRef(null)
-    let input_pic;
     function publishHandler() {
-        // const pinataSDK = require('@pinata/sdk');
-        // const pinata = pinataSDK('4389a831f6973c6a4dd1', 'a2a3afaf7a45705101c9f5ef5959f63af67a76de664674adc1a5a0dcd99422df');
-        // const readableStreamForFile = fs.createReadStream(input_pic);
-        // const options = {
-        //     pinataMetadata: {
-        //         name: input_name,
-        //         keyvalues: {
-        //             name: input_name.current.value,
-        //             price: input_price.current.value,
-        //             author: input_author.current.value,
-        //             description: input_description.current.value
-        //         }
-        //     },
-        //     pinataOptions: {
-        //         cidVersion: 0
-        //     }
-        // };
-        // pinata.pinFileToIPFS(readableStreamForFile, options).then((result) => {
-        //     //handle results here
-        //     console.log(result);
-        // }).catch((err) => {
-        //     //handle error here
-        //     console.log(err);
-        // });
 
     }
-
-    return <div id="App" >
+    return <div id="App">
         <div className="container">
             <NavigationBar />
             <div className="welcome">
@@ -131,32 +146,40 @@ function PublishPage() {
                 <p>Description:</p>
                 <input type={"text"}  ref={input_description}/>
                 <br/>
-                <Upload
-                    name="avatar"
-                    listType="picture-card"
-                    className="avatar-uploader"
-                    showUploadList={false}
-                    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                    beforeUpload={beforeUpload}
-                    onChange={handleChange}
-                >
-                    {imageUrl ? (
-                        <img
-                            src={imageUrl}
-                            alt="avatar"
-                            style={{
-                                width: '100%',
-                            }}
-                        />
-                    ) : (
-                        uploadButton
-                    )}
-                </Upload>
+                <div className="App">
+                    <header className="App-header">
+                        {ipfs && (
+                            <>
+                                <p>Upload File using IPFS</p>
+
+                                <form onSubmit={onSubmitHandler}>
+                                    <input name="file" type="file" />
+
+                                    <button type="submit">Upload File</button>
+                                </form>
+
+                                <div>
+                                    {images.map((image, index) => (
+                                        <img
+                                            alt={`Uploaded #${index + 1}`}
+                                            src={"https://ipfs.infura.io/ipfs/" + image.path}
+                                            style={{ maxWidth: "400px", margin: "15px" }}
+                                            key={image.cid.toString() + index}
+                                        />
+                                    ))}
+                                </div>
+                            </>
+                        )}
+
+                        {!ipfs && (
+                            <p>Oh oh, Not connected to IPFS. Checkout out the logs for errors</p>
+                        )}
+                    </header>
+                </div>
                 <br/>
                 <Button variant="contained" component="label" color="primary" onClick={publishHandler}>Publish</Button>
             </Box>
         </div>
     </div>
 }
-
-export default PublishPage;
+export default publishPage;
