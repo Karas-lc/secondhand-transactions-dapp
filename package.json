@@ -3,13 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@alch/alchemy-web3": "^1.4.6",
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
     "@mui/icons-material": "^5.10.2",
     "@mui/material": "^5.10.2",
+    "@openzeppelin/contracts": "^4.7.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "dotenv": "^16.0.1",
     "install": "^0.13.0",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "npm": "^8.18.0",
@@ -22,15 +25,10 @@
     "web3": "^1.7.5"
   },
   "scripts": {
-
     "start": "react-app-rewired start",
-
     "build": "react-app-rewired build",
-
     "test": "react-app-rewired test",
-
     "eject": "react-scripts eject"
-
   },
   "eslintConfig": {
     "extends": [
@@ -51,9 +49,12 @@
     ]
   },
   "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.1.1",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
+    "ethers": "^5.0.0",
+    "hardhat": "^2.10.2",
     "https-browserify": "^1.0.0",
     "os-browserify": "^0.3.0",
     "stream-browserify": "^3.0.0",
