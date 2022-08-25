@@ -2,7 +2,7 @@ import NavigationBar from "../components/NavivationBar";
 import React, {useEffect, useRef, useState} from "react";
 import Web3 from "web3";
 import Box from "@mui/material/Box";
-import {Button, message, Upload} from "antd"
+import {Button, message, Upload} from "antd";
 import {LoadingOutlined, PlusOutlined, UploadOutlined} from '@ant-design/icons';
 import * as pinata from "@pinata/sdk";
 
@@ -77,31 +77,31 @@ function PublishPage() {
     const input_description = useRef(null)
     let input_pic;
     function publishHandler() {
-        const pinataSDK = require('@pinata/sdk');
-        const pinata = pinataSDK('4389a831f6973c6a4dd1', 'a2a3afaf7a45705101c9f5ef5959f63af67a76de664674adc1a5a0dcd99422df');
-        const fs = require('fs');
-        const readableStreamForFile = fs.createReadStream(input_pic);
-        const options = {
-            pinataMetadata: {
-                name: input_name,
-                keyvalues: {
-                    name: input_name.current.value,
-                    price: input_price.current.value,
-                    author: input_author.current.value,
-                    description: input_description.current.value
-                }
-            },
-            pinataOptions: {
-                cidVersion: 0
-            }
-        };
-        pinata.pinFileToIPFS(readableStreamForFile, options).then((result) => {
-            //handle results here
-            console.log(result);
-        }).catch((err) => {
-            //handle error here
-            console.log(err);
-        });
+        // const pinataSDK = require('@pinata/sdk');
+        // const pinata = pinataSDK('4389a831f6973c6a4dd1', 'a2a3afaf7a45705101c9f5ef5959f63af67a76de664674adc1a5a0dcd99422df');
+        // const readableStreamForFile = fs.createReadStream(input_pic);
+        // const options = {
+        //     pinataMetadata: {
+        //         name: input_name,
+        //         keyvalues: {
+        //             name: input_name.current.value,
+        //             price: input_price.current.value,
+        //             author: input_author.current.value,
+        //             description: input_description.current.value
+        //         }
+        //     },
+        //     pinataOptions: {
+        //         cidVersion: 0
+        //     }
+        // };
+        // pinata.pinFileToIPFS(readableStreamForFile, options).then((result) => {
+        //     //handle results here
+        //     console.log(result);
+        // }).catch((err) => {
+        //     //handle error here
+        //     console.log(err);
+        // });
+
     }
 
     return <div id="App" >
